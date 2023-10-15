@@ -1,10 +1,13 @@
 import React, { useCallback, useState } from "react";
 import { useSocket } from "../context/SocketProvider";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Lobby = () => {
   const [email, setemail] = useState("");
   const [room, setroom] = useState("");
   const socket = useSocket();
+  const navigate = useNavigate();
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -12,6 +15,18 @@ const Lobby = () => {
     },
     [email, room, socket]
   );
+  const handleJoinRoom = useCallback(
+    (data) => {
+      const { email, room } = data;
+      navigate(`/room/${room}`);
+    },
+    [navigate]
+  );
+  useEffect(() => {
+    socket.on("room:join", (data) => {
+      handleJoinRoom(data);
+    });
+  }, [socket]);
   return (
     <>
       <form onSubmit={handleSubmit}>
